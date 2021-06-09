@@ -1,5 +1,7 @@
 """This script search crib list for items that are on an "always order" list and marks them accordingly. The file
-must be saved at c:/users/public/documents as 'criblist.csv'. It is better to remove items not puchased in SAP first"""
+must be saved at c:/users/public/documents as 'criblist.csv'. Can also search by RXM number. It runs better if
+items not puchased in SAP are removed first"""
+
 import pandas as pd
 from datetime import date
 
@@ -18,7 +20,11 @@ parts_to_order = pd.DataFrame()
 #search for the term and save it to parts_to_order
 for i in range(len(always_order_list.Description)):
     term = always_order_list.Description.iloc[i].upper()
-    parts_to_order = parts_to_order.append(crib_item_list[crib_item_list['Description'].str.contains(term)])
+    if term.find('RXM') == 0:
+        #This differentiates between an rxm number and a part description
+        parts_to_order = parts_to_order.append(crib_item_list[crib_item_list['Part#'].str.contains(term)])
+    else:
+        parts_to_order = parts_to_order.append(crib_item_list[crib_item_list['Description'].str.contains(term)])
 
 #remove any duplicates
 parts_to_order = parts_to_order.drop_duplicates()
